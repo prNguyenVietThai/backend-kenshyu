@@ -14,7 +14,7 @@ http://localhost:8000
 ```
 Root account:
 - username: root
-- password: 123456
+- password: root
 
 User account:
 - username: devuser
@@ -22,7 +22,7 @@ User account:
 
 Create 'test_db' database and import data from file:
 ```sh
-/backend-kenshyu/database/test_db.sql
+/backend-kenshyu/src/database/test_db.sql
 ```
 ___
 #Result
