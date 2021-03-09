@@ -7,22 +7,20 @@
     <title>Post</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
 <div class="container">
     <br>
     <div class="row">
         <div class="col-6">
-            <?php if($data['message']): ?>
+            <?php if(isset($data['ok']) && $data['ok']): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <strong><i class="fa fa-check"></i></strong> <?php echo $data['message'];  ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            <?php elseif($data['error']): ?>
+            <?php elseif(isset($data['ok']) && !$data['ok']): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong><i class="fa fa-close"></i></strong> <?php echo $data['error']; ?>
+                    <strong><i class="fa fa-close"></i></strong> <?php echo $data['message']; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif ?>
@@ -30,7 +28,7 @@
             <a class="btn btn-primary" href="/"><i class="fa fa-home"></i> Go to homepage</a>
             <hr>
             <h3 class="text-center">Post</h3><br>
-            <form id="form-create" enctype="multipart/form-data">
+            <form enctype="multipart/form-data" action="/posts/create" method="POST">
                 <div class="mb-3 row">
                     <label class="col-form-label"><b>Title</b></label>
                     <div class="col-12">
@@ -47,35 +45,11 @@
                     <input type="file" class="form-control" name="images[]" accept="image/x-png,image/gif,image/jpeg" multiple>
                 </div>
                 <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
+                <button type="submit" class="btn btn-success">Save</button>
             </form>
-            <button id="create-post" type="button" class="btn btn-success">Save</button>
             <br>
         </div>
     </div>
 </div>
-
-<script>
-    $('#create-post').on('click', function () {
-        let form = new FormData(document.querySelector('#form-create'));
-        fetch("/posts/create", {
-            method: "POST",
-            body: form
-        })
-        .then(res => res.json())
-        .then(res => {
-            console.log(res)
-            Swal.fire({
-                position: 'center',
-                icon: res.ok ? 'success' : 'error',
-                title: res.message,
-                showConfirmButton: false,
-                timer: 2000
-            })
-        })
-        .catch(e => {
-            console.error("alalala loi roif");
-        })
-    });
-</script>
 </body>
 </html>

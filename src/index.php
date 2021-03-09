@@ -11,6 +11,7 @@
     $uri = $_SERVER['REQUEST_URI'];
     $method = $_SERVER['REQUEST_METHOD'];
     $method_sub = $_POST['_method'];
+
     $http_method = strtoupper($method);
     if($method_sub){
         $method_sub = strtoupper($method_sub);

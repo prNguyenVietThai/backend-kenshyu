@@ -13,10 +13,19 @@ class AuthController extends Controller {
         }
 
         $posts = $this->model("Post")->query("
-                SELECT posts.id as id, title, content, thumbnail, user_id, users.name as user_name, users.email as user_email, posts.created_at as created_at
+                SELECT 
+                    posts.id as id,
+                    posts.title as title,
+                    posts.content as content,
+                    images.url as thumbnail,
+                    users.name as user_name,
+                    users.email as user_email,
+                    posts.created_at as created_at
                 FROM posts
                 LEFT OUTER JOIN users
                 ON posts.user_id = users.id
+                LEFT OUTER JOIN images
+                ON posts.thumbnail = images.id
                 ORDER BY posts.created_at DESC;
             ")->fetchAll();
 

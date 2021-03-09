@@ -38,36 +38,57 @@ class PostController extends Controller {
             if(!$post){
                 $error = 'cannot create post, try again later';
             }else{
-                $fileExtensions = ["jpeg", "jpg", "png"];
+                if($_FILES['images']['name'][0]) {
+                    $fileExtensions = ["jpeg", "jpg", "png"];
 
-                for($i=0; $i < count($_FILES['images']['name']); $i++){
-                    $fileTmpPath = $_FILES['images']['tmp_name'][$i];
-                    $fileName = $_FILES['images']['name'][$i];
-                    $fileNameCmps = explode(".", $fileName);
-                    $fileExtension = strtolower(end($fileNameCmps));
+                    for($i=0; $i < count($_FILES['images']['name']); $i++){
+                        $fileTmpPath = $_FILES['images']['tmp_name'][$i];
+                        $fileName = $_FILES['images']['name'][$i];
+                        $fileNameCmps = explode(".", $fileName);
+                        $fileExtension = strtolower(end($fileNameCmps));
 
-                    $uploadFileDir = '/public/assets/';
-                    $hashFileName = md5(time() . $fileName);
-                    $dest_path = $uploadFileDir . $hashFileName . "." . $fileExtension;
+                        $uploadFileDir = '/public/assets/';
+                        $hashFileName = md5(time() . $fileName);
+                        $dest_path = $uploadFileDir . $hashFileName . "." . $fileExtension;
 
-                    if(in_array($fileExtension, $fileExtensions)){
-                        move_uploaded_file($fileTmpPath, ".".$dest_path);
-                        $this->model("Image")->query("
-                            INSERT INTO images (url, post_id)
-                            VALUES ('$dest_path', $postId);
-                        ");
+                        if(in_array($fileExtension, $fileExtensions)){
+                            move_uploaded_file($fileTmpPath, ".".$dest_path);
+                            if($i == 0){
+                                echo "tao thumbnail";
+                                $imageModel = $this->model("Image");
+                                $iconn = $imageModel->db->dbHandler;
+                                $iconn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $image = $iconn->query("
+                                    INSERT INTO images (url, post_id)
+                                    VALUES ('$dest_path', $postId);
+                                ");
+                                $imageId = $iconn->lastInsertId();
+                                echo $imageId;
+                                $update = $this->model("Post")->query("
+                                    UPDATE posts
+                                    SET thumbnail = $imageId
+                                    WHERE id = $postId
+                                ");
+                                var_dump($update);
+                            }else{
+                                $this->model("Image")->query("
+                                    INSERT INTO images (url, post_id)
+                                    VALUES ('$dest_path', $postId);
+                                ");
+                            }
+                        }
                     }
                 }
             }
         }
 
         if(!$error){
-            return $this->response(200, [
+            return $this->view("post-create", [
                 "ok" => true,
                 "message" => 'create post successfully'
             ]);
         }else{
-            return $this->response(400, [
+            return $this->view("post-create", [
                 "ok" => false,
                 "message" => $error
             ]);
@@ -114,31 +135,37 @@ class PostController extends Controller {
 
     public function update($id){
         $error = '';
-        $title = $_REQUEST['title'];
-        $description = $_REQUEST['description'];
-        if(!$title || !$description){
-            $error = 'Title or description not null';
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+
+        if(!$title || !$content){
+            $error = 'Title or content not null';
         }
         if(!$error){
             $data = $this->model("Post")->query("
-                    UPDATE posts
-                    SET title = '$title', description = '$description'
-                    WHERE id = $id;
-                ");
-        }
-        if(!$data){
-            $error = "Edit post faile";
+                UPDATE posts
+                SET title = '$title', content = '$content'
+                WHERE id = $id;
+            ");
+            if(!$data){
+                $error = "Edit post faile";
+            }
         }
 
+        $post = $this->getPostInfo($id);
         if($error) {
-            $this->response(400, [
+            return $this->view("post-edit", [
                 "ok" => false,
-                "message" => $error
+                "message" => $error,
+                "post" => $post["post"],
+                "images" => $post["images"]
             ]);
         }else{
-            $this->response(200, [
-                'ok' => true,
-                'message' => 'edit successfully'
+            return $this->view("post-edit", [
+                "ok" => true,
+                "message" => "update post successfully",
+                "post" => $post["post"],
+                "images" => $post["images"]
             ]);
         }
     }
@@ -146,8 +173,11 @@ class PostController extends Controller {
     public function delete($id)
     {
         $delete = $this->model("Post")->query("
-                DELETE FROM posts WHERE id='$id';
-            ");
+            DELETE FROM posts WHERE id='$id';
+        ");
+        echo [
+            "ok" => "kkk"
+        ];
         if(!$delete) {
             $this->response(400, [
                 "ok" => false,

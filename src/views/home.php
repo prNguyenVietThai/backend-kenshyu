@@ -81,7 +81,7 @@
                                 <?php echo($key['title']); ?>
                             </div>
                             <div class="post__body-description">
-                                <?php echo($key['description']); ?>
+                                <?php echo($key['content']); ?>
                             </div>
                             <div class="post__body-thumbnail">
                                 <img src="<?php echo $key['thumbnail']; ?>">
@@ -105,7 +105,6 @@
                 let id = $('.deletePost').val();
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -113,33 +112,46 @@
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/posts/delete/' + id,
-                            type: "DELETE"
-                        }).done(function (res){
-                            let data = JSON.parse(res);
-                            console.log(data);
-                            if(data.ok){
-                                $(`#post-${id}`).remove();
-                                Swal.fire({
-                                    position: 'center',
-                                    icon: 'success',
-                                    title: data.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                })
-                            }else{
-                                Swal.fire({
-                                    position: 'center',
-                                    icon: 'warning',
-                                    title: data.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                })
-                            }
-                        }).fail(function (){
-                            alert("ajax faile");
+                        fetch("/posts/delete/"+id, {
+                            method: "DELETE"
                         })
+                        .then(res => res.json())
+                        .then(res => {
+                            Swal.fire({
+                                position: 'center',
+                                icon: res.ok ? 'success' : 'error',
+                                title: res.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            })
+                        });
+                        // $.ajax({
+                        //     url: '/posts/delete/' + id,
+                        //     type: "DELETE"
+                        // }).done(function (res){
+                        //     let data = JSON.parse(res);
+                        //     console.log(data);
+                        //     if(data.ok){
+                        //         $(`#post-${id}`).remove();
+                        //         Swal.fire({
+                        //             position: 'center',
+                        //             icon: 'success',
+                        //             title: data.message,
+                        //             showConfirmButton: false,
+                        //             timer: 2000
+                        //         })
+                        //     }else{
+                        //         Swal.fire({
+                        //             position: 'center',
+                        //             icon: 'warning',
+                        //             title: data.message,
+                        //             showConfirmButton: false,
+                        //             timer: 2000
+                        //         })
+                        //     }
+                        // }).fail(function (){
+                        //     alert("ajax faile");
+                        // })
                     }
                 })
             });
