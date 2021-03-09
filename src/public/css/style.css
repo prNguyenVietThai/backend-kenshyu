@@ -1,0 +1,157 @@
+body {
+    width: 100%;
+    min-height: 100vh;
+    background: #e1e1e1;
+}
+
+.container {
+    padding: 50px;
+}
+
+.profile {
+    background-color: #fff;
+    width: 400px;
+    display: block;
+    float: left;
+    position: fixed;
+}
+
+.profile__header {
+    width: 100%;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid #e1e1e1;
+}
+
+.profile__image {
+    width: 80px;
+    height: 80px;
+    background-color: transparent;
+}
+
+.profile__image > img {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+}
+
+.profile__user {
+    display: block;
+    margin-left: 30px;
+}
+
+.profile__user-title {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 16px;
+    padding: 10px 0px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #d1d1d1;
+}
+
+.profile__user-info {
+    line-height: 13px;
+    font-size: 13px;
+    color: #a1a1a1;
+}
+
+.profile__body {
+    padding: 30px;
+}
+
+.profile__footer {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.content {
+    width: 800px;
+    background-color: transparent;
+    float: right;
+}
+
+.post {
+    width: 100%;
+    background-color: #fff;
+    margin-bottom: 80px;
+}
+
+.post__header {
+    padding: 18px 30px;
+    border-bottom: 1px solid #e1e1e1;
+    display: flex;
+    align-items: center;
+}
+
+.post__header-image,  .post__header-image > img{
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+}
+
+.post__header-info {
+    padding: 10px;
+}
+
+.post__header-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+}
+
+.post__header-time{
+    line-height: 24px;
+    font-size: 14px;
+    color: #a1a1a1;
+}
+
+.post__body {
+    padding: 30px;
+}
+
+.post__body-title {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.post__body-thumbnail {
+    width: 100%;
+}
+
+.post__body-thumbnail > img {
+    max-width: 100%;
+}
+
+.post__body-images {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.post__body-images-item, .post__body-images-item > img {
+    display: block;
+    width: 128px;
+}
+
+.post__body-images-item {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.post__footer {
+    display: flex;
+    border-top: 1px solid #e1e1e1;
+    padding: 18px 30px;
+}
+
+.post__footer-action {
+    font-size: 14px;
+}
+
+.post__footer-action-icon {
+    color: #f4097b;
+}

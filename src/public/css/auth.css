@@ -54,21 +54,28 @@ body {
     background-color: black;
 }
 
+.login-btn {
+    padding: 5px 12px;
+    border-radius: 5px;
+    background-color: #57b864;
+    color: #fff;
+}
 
 .form-group {
     display: block;
     width: 100%;
-    margin: 50px 0px;
+    margin: 20px 0px;
 }
 
 .form-group label {
     display: block;
-    font-size: 20px;
+    font-size: 14px;
     color: #a2a2a2;
+    font-weight: bold;
 }
 
 .form-group input {
-    font-size: 18px;
+    font-size: 14px;
     box-sizing: border-box;
     width: 100%;
     padding: 5px 12px;

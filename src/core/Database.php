@@ -1,9 +1,9 @@
 <?php
     class Database {
-        private $dbHost = "localhost";
+        private $dbHost = "db";
         private $dbUser = "root";
         private $dbPass = "root";
-        private $dbName = "mydb";
+        private $dbName = "test_db";
 
         public $dbHandler;
         public $error;

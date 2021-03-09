@@ -15,9 +15,12 @@
 
         public function view($view, $data = []) {
             if (file_exists('./views/' . $view . '.php')) {
-                include './views/' . $view . '.php';
-            } else {
-                echo("View does not exists.");
+                include_once './views/' . $view . '.php';
             }
+        }
+
+        public function response($status=200, $data = []) {
+            http_response_code($status);
+            echo json_encode($data);
         }
     }
