@@ -15,7 +15,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <img style="width: 40px" src="./public/assets/user.png">
+                <img style="width: 40px" src="/public/user-icon.png">
             </a>
             <span style="display: inline-block; width: 200px"><?php echo $data['user']['name']; ?></span></p>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                     <div id="<?php echo 'post-'.$key['id']  ?>" class="post">
                         <div class="post__header">
                             <div class="post__header-image">
-                                <img src="./views/assets/image/user/user<?php echo rand(1, 6) ?>.png">
+                                <img src="/public/user-icon.png">
                             </div>
                             <div class="post__header-info">
                                 <div class="post__header-title"><?php echo $key['user_name']; ?></div>
