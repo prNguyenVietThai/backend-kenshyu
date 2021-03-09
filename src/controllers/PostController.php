@@ -175,9 +175,6 @@ class PostController extends Controller {
         $delete = $this->model("Post")->query("
             DELETE FROM posts WHERE id='$id';
         ");
-        echo [
-            "ok" => "kkk"
-        ];
         if(!$delete) {
             $this->response(400, [
                 "ok" => false,

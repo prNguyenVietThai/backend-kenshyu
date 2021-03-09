@@ -18,6 +18,7 @@ class AuthController extends Controller {
                     posts.title as title,
                     posts.content as content,
                     images.url as thumbnail,
+                    users.id as user_id,
                     users.name as user_name,
                     users.email as user_email,
                     posts.created_at as created_at

@@ -90,7 +90,7 @@
                         <div class="post__footer">
                             <a class="btn btn-outline-primary" href="/posts/show/<?php echo $key['id']; ?>" style="margin-right: 5px">Detail</a>
                             <?php if($key['user_id'] == $_SESSION['id']): ?>
-                                <button class="deletePost btn btn-outline-danger" value="<?php echo $key['id'];　?>">Delete</button>
+                                <button class="btn btn-outline-danger" onclick="deletePost(<?php echo $key['id'] ?>)">Delete</button>
                             <?php endif ?>
                         </div>
                     </div>
@@ -100,62 +100,35 @@
         </div>
     </div>
     <script type="text/javascript">
-        $(document).ready(function(){
-            $('.deletePost').click(function (){
-                let id = $('.deletePost').val();
-                Swal.fire({
-                    title: 'Are you sure?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch("/posts/delete/"+id, {
-                            method: "DELETE"
-                        })
-                        .then(res => res.json())
-                        .then(res => {
-                            Swal.fire({
-                                position: 'center',
-                                icon: res.ok ? 'success' : 'error',
-                                title: res.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            })
+        function deletePost(id){
+            Swal.fire({
+                title: 'Are you sure?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("/posts/delete/"+id, {
+                        method: "DELETE"
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.ok){
+                            $(`#post-${id}`).remove();
+                        }
+                        Swal.fire({
+                            position: 'center',
+                            icon: res.ok ? 'success' : 'error',
+                            title: res.message,
+                            showConfirmButton: false,
+                            timer: 2000
                         });
-                        // $.ajax({
-                        //     url: '/posts/delete/' + id,
-                        //     type: "DELETE"
-                        // }).done(function (res){
-                        //     let data = JSON.parse(res);
-                        //     console.log(data);
-                        //     if(data.ok){
-                        //         $(`#post-${id}`).remove();
-                        //         Swal.fire({
-                        //             position: 'center',
-                        //             icon: 'success',
-                        //             title: data.message,
-                        //             showConfirmButton: false,
-                        //             timer: 2000
-                        //         })
-                        //     }else{
-                        //         Swal.fire({
-                        //             position: 'center',
-                        //             icon: 'warning',
-                        //             title: data.message,
-                        //             showConfirmButton: false,
-                        //             timer: 2000
-                        //         })
-                        //     }
-                        // }).fail(function (){
-                        //     alert("ajax faile");
-                        // })
-                    }
-                })
-            });
-        });
+                    });
+                }
+            })
+        }
     </script>
 </body>
 </html>
