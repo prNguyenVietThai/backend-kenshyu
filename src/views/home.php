@@ -94,21 +94,88 @@
                     <div class="card-header">
                         Tags
                     </div>
-                    <div class="card-body d-flex-wrap">
-                        <div class="badge bg-secondary">#nguoiyeucu</div>
-                        <div class="badge bg-primary">#nihon</div>
-                        <div class="badge bg-danger">#newyear</div>
-                        <div class="badge bg-success">#shop</div>
-                        <div class="badge bg-secondary">#2021</div>
-                        <div class="badge bg-warning">#corona</div>
-                        <div class="badge bg-secondary">#prtimes</div>
-                        <div class="badge bg-secondary">#tayori</div>
+                    <div id="tag-list" class="card-body d-flex-wrap">
+                        <?php if(is_array($data['tags'])):?>
+                        <?php foreach ($data['tags'] as $tag):?>
+                            <div class="badge bg-secondary">#<?php echo $tag['title'] ?></div>
+                        <?php endforeach;?>
+                        <?php endif?>
                     </div>
+                </div>
+                <?php if($_SESSION['id']): ?>
+                <div class="tag-create">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        <i class="fa fa-plus"></i>
+                        Create new tag
+                    </button>
+                </div>
+                <?php endif?>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Create new tag</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-create-tag">
+                        <div class="mb-3 row">
+                            <label class="col-form-label"><b>Title</b></label>
+                            <div class="col-12">
+                                <input id="tag-title" type="text" class="form-control" name="title">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-form-label"><b>Description</b></label>
+                            <div class="col-12">
+                                <textarea id="tag-description" type="text" class="form-control" name="description" style="height: 150px"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createTag()">Save</button>
                 </div>
             </div>
         </div>
     </div>
+
     <script type="text/javascript">
+        function createTag() {
+            let title = document.getElementById("tag-title");
+            let description = document.getElementById("tag-description");
+            let form = new FormData(document.getElementById("form-create-tag"));
+
+            fetch("/tags/create", {
+                method: "POST",
+                body: form
+            })
+                .then(res => res.json())
+                .then(res => {
+                    title.value = "";
+                    description.value = "";
+                    Swal.fire({
+                        position: 'center',
+                        icon: res.ok ? 'success' : 'error',
+                        title: res.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    let taglist = document.getElementById("tag-list");
+                    console.log(taglist);
+                    console.log(res);
+                    let tag = document.createElement("div");
+                    tag.appendChild(document.createTextNode(`#${res.tag.title}`))
+                    tag.classList.add("badge");
+                    tag.classList.add("bg-secondary");
+                    taglist.appendChild(tag);
+                });
+        }
+
         function deletePost(id){
             Swal.fire({
                 title: 'Are you sure?',

@@ -11,48 +11,51 @@
 </head>
 <body style="padding: 50px">
     <div class="row">
-        <div class="col-4">
-            <?php if(isset($data['ok']) && $data['ok']): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong><i class="fa fa-check"></i></strong> <?php echo $data['message'];  ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php elseif(isset($data['ok']) && !$data['ok']): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong><i class="fa fa-close"></i></strong> <?php echo $data['message']; ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif ?>
+        <?php if(isset($data) && $data['message'] != 'Permission denied' && $data['message'] != 'Unauthenticated'): ?>
+            <div class="col-4">
+                <?php if(isset($data['ok']) && $data['ok']): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong><i class="fa fa-check"></i></strong> <?php echo $data['message'];  ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php elseif(isset($data['ok']) && !$data['ok']): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="fa fa-close"></i></strong> <?php echo $data['message']; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif ?>
 
-            <a class="btn btn-primary" href="/"><i class="fa fa-home"></i> Go to homepage</a>
-            <hr>
-            <h3 class="text-center">Post</h3><br>
-            <form id="form-edit" action="/posts/edit/<?php echo $data['post']['id']; ?>" method="POST">
-                <div class="mb-3 row">
-                    <label class="col-form-label"><b>Title</b></label>
-                    <div class="col-12">
-                        <input type="text" class="form-control" name="title" value="<?php echo $data['post']['title']?>">
+                <a class="btn btn-primary" href="/"><i class="fa fa-home"></i> Go to homepage</a>
+                <hr>
+                <h3 class="text-center">Post</h3><br>
+                <form id="form-edit" action="/posts/edit/<?php echo $data['post']['id']; ?>" method="POST">
+                    <div class="mb-3 row">
+                        <label class="col-form-label"><b>Title</b></label>
+                        <div class="col-12">
+                            <input type="text" class="form-control" name="title" value="<?php echo $data['post']['title']?>">
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3 row">
-                    <label class="col-form-label"><b>Description</b></label>
-                    <div class="col-12">
-                        <textarea type="text" class="form-control" name="content" style="height: 150px"><?php echo $data['post']['content']?></textarea>
+                    <div class="mb-3 row">
+                        <label class="col-form-label"><b>Description</b></label>
+                        <div class="col-12">
+                            <textarea type="text" class="form-control" name="content" style="height: 150px"><?php echo $data['post']['content']?></textarea>
+                        </div>
                     </div>
-                </div>
-                <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
-                <input type="hidden" name="_method" value="PATCH">
-                <button id="edit-post" type="submit" class="btn btn-success">Save</button>
-                <a href="/posts/show/<?php echo $data['post']['id'] ?>" class="btn btn-danger">Cancel</a>
-            </form>
-            <br>
-        </div>
-        <div class="col-8 d-flex-wrap">
-            <?php foreach ($data['images'] as $key) : ?>
-                <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button id="edit-post" type="submit" class="btn btn-success">Save</button>
+                    <a href="/posts/show/<?php echo $data['post']['id'] ?>" class="btn btn-danger">Cancel</a>
+                </form>
                 <br>
-            <?php endforeach;?>
-        </div>
+            </div>
+            <div class="col-8 d-flex-wrap">
+                <?php foreach ($data['images'] as $key) : ?>
+                    <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
+                    <br>
+                <?php endforeach;?>
+            </div>
+        <?php else: ?>
+            <h4 class="text-center"><?php echo $data['message']?></h4>
+        <?php endif ?>
     </div>
 </body>
 </html>

@@ -7,7 +7,6 @@ class PostController extends Controller {
     public function index()
     {
         $data = $this->model("Post")->find();
-        var_dump($data);
     }
 
     public function create()
@@ -54,7 +53,6 @@ class PostController extends Controller {
                         if(in_array($fileExtension, $fileExtensions)){
                             move_uploaded_file($fileTmpPath, ".".$dest_path);
                             if($i == 0){
-                                echo "tao thumbnail";
                                 $imageModel = $this->model("Image");
                                 $iconn = $imageModel->db->dbHandler;
                                 $iconn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -63,13 +61,11 @@ class PostController extends Controller {
                                     VALUES ('$dest_path', $postId);
                                 ");
                                 $imageId = $iconn->lastInsertId();
-                                echo $imageId;
                                 $update = $this->model("Post")->query("
                                     UPDATE posts
                                     SET thumbnail = $imageId
                                     WHERE id = $postId
                                 ");
-                                var_dump($update);
                             }else{
                                 $this->model("Image")->query("
                                     INSERT INTO images (url, post_id)
@@ -95,24 +91,42 @@ class PostController extends Controller {
         }
     }
 
-    private function getPostInfo($id)
+    private function getPostInfo($id, $edit=false)
     {
         $postId = $id;
-        $post = $this->model("Post")->query("
-                SELECT 
-                    posts.id as id, 
-                    title, 
-                    content, 
-                    thumbnail, 
-                    user_id, 
-                    users.name as user_name, 
-                    users.email as user_email,
-                    posts.created_at as created_at
-                FROM posts
-                LEFT OUTER JOIN users
-                ON posts.user_id = users.id
-                WHERE posts.id = $postId;
-            ")->fetch();
+        $userId = $_SESSION['id'];
+        if(!$userId){
+            return [
+                "ok" => false,
+                "message" => "Unauthenticated"
+            ];
+        }
+        $query = "
+            SELECT 
+                posts.id as id, 
+                title, 
+                content, 
+                thumbnail, 
+                user_id, 
+                users.name as user_name, 
+                users.email as user_email,
+                posts.created_at as created_at
+            FROM posts
+            LEFT OUTER JOIN users
+            ON posts.user_id = users.id
+            WHERE posts.id = $postId
+        ";
+        if($edit){
+            $query = $query." AND posts.user_id = $userId";
+        }
+
+        $post = $this->model("Post")->query($query)->fetch();
+        if(!$post){
+            return [
+                "ok" => false,
+                "message" => "Permission denied"
+            ];
+        }
         $images = $this->model("Image")->query("SELECT * FROM images WHERE post_id = '$postId';")->fetchAll();
 
         return [
@@ -129,14 +143,21 @@ class PostController extends Controller {
 
     public function edit($id)
     {
-        $data = $this->getPostInfo($id);
+        $data = $this->getPostInfo($id, true);
         $this->view("post-edit", $data);
     }
 
     public function update($id){
         $error = '';
-        $title = $_POST['title'];
-        $content = $_POST['content'];
+
+        $postId = (int)$id;
+        $userId = (int)$_SESSION['id'];
+        if(!$postId || !$userId){
+            $error = "Information invalid";
+        }
+
+        $title = (string)$_POST['title'];
+        $content = (string)$_POST['content'];
 
         if(!$title || !$content){
             $error = 'Title or content not null';
@@ -145,14 +166,14 @@ class PostController extends Controller {
             $data = $this->model("Post")->query("
                 UPDATE posts
                 SET title = '$title', content = '$content'
-                WHERE id = $id;
+                WHERE id = $postId AND user_id = $userId;
             ");
             if(!$data){
                 $error = "Edit post faile";
             }
         }
 
-        $post = $this->getPostInfo($id);
+        $post = $this->getPostInfo($postId);
         if($error) {
             return $this->view("post-edit", [
                 "ok" => false,

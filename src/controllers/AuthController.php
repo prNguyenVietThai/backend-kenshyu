@@ -30,6 +30,11 @@ class AuthController extends Controller {
                 ORDER BY posts.created_at DESC;
             ")->fetchAll();
 
+        $tags = $this->model("Tag")->find();
+        if($tags){
+            $data['tags'] = $tags;
+        }
+
         if($posts) {
             $data['posts'] = $posts;
         }

@@ -10,6 +10,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
 <div class="container">
@@ -17,16 +18,20 @@
     <?php if(isset($_SESSION) && $_SESSION['id']) :?>
         <div class="row">
             <div class="col-4">
-                <?php if(isset($data['ok']) && $data['ok']): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong><i class="fa fa-check"></i></strong> <?php echo $data['message'];  ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <?php elseif(isset($data['ok']) && !$data['ok']): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong><i class="fa fa-close"></i></strong> <?php echo $data['message']; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <?php if(isset($data['ok'])): ?>
+                    <script>
+                        Swal.fire({
+                            position: 'center',
+                            icon: '<?php echo($data["ok"] ? "success" : "error");?>',
+                            title: '<?php echo $data['message']; ?>',
+                            showConfirmButton: false,
+                            timer: 1000,
+                            allowOutsideClick: false
+                        });
+                        setTimeout(function (){
+                            location.href = "/posts/create";
+                        }, 1000);
+                    </script>
                 <?php endif ?>
 
                 <a href="/"><i class="fa fa-home"></i> Go to homepage</a>
@@ -46,16 +51,16 @@
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label class="col-form-label"><b>Tags</b></label>
+                        <label class="col-form-label"><b>Use tags</b></label>
                         <div class="col-12">
-                            <select id="tags" class="form-control" name="states[]" multiple="multiple">
+                            <select id="tags" class="form-control" name="usetags[]" multiple="multiple">
                                 <option value="AL">Alabama</option>
                                 <option value="WY">Wyoming</option>
                             </select>
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label class="col-form-label"><b>Tags</b></label>
+                        <label class="col-form-label"><b>Create new tags</b> Ex: #something, v.v.</label>
                         <div class="col-12">
                             <input type="text" class="form-control" name="tags">
                         </div>

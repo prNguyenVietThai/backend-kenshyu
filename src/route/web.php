@@ -14,3 +14,7 @@ Route::get("/posts/edit/{id}", "PostController@edit");
 Route::post("/posts/create", "PostController@store");
 Route::patch("/posts/edit/{id}", "PostController@update");
 Route::delete("/posts/delete/{id}", "PostController@delete");
+
+Route::get("/tags", "TagController@index");
+Route::post("/tags/create", "TagController@store");
+Route::delete("/tags/delete/{id}", "TagController@delete");

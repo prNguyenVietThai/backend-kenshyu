@@ -27,7 +27,6 @@
                     <?php echo $data['post']['content']?>
                 </div>
             </div>
-            <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
 
             <?php if($data['post']['user_id'] == $_SESSION['id']): ?>
                 <a href="/posts/edit/<?php echo $data['post']['id'] ?>" class="btn btn-primary">Edit</a>
@@ -35,10 +34,12 @@
             <br>
         </div>
         <div class="col-8 d-flex-wrap">
-            <?php foreach ($data['images'] as $key) : ?>
-                <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
-                <br>
-            <?php endforeach;?>
+            <?php if(is_array($data['images'])): ?>
+                <?php foreach ($data['images'] as $key) : ?>
+                    <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
+                    <br>
+                <?php endforeach;?>
+            <?php endif?>
         </div>
     </div>
 </form>
