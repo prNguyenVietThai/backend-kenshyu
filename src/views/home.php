@@ -2,9 +2,9 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/reset.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-    <link rel="stylesheet" href="./public/css/style.css">
+    <link rel="stylesheet" href="/public/css/style.css">
     <title>Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
@@ -17,21 +17,22 @@
             <a class="navbar-brand" href="/">
                 <img style="width: 40px" src="/public/user-icon.png">
             </a>
-            <span style="display: inline-block; width: 200px"><?php echo $data['user']['name']; ?></span></p>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/posts">My posts</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/posts/create">Up post</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile">Profile</a>
-                    </li>
+                    <?php if($_SESSION['id']) :?>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/posts">My posts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/posts/create">Up post</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/profile">Profile</a>
+                        </li>
+                    <?php endif?>
                 </ul>
                 <div class="d-flex">
                     <?php if(isset($_SESSION) && $_SESSION["name"] && $_SESSION["email"]): ?>
@@ -46,24 +47,15 @@
     </nav>
     <div class="container">
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-8">
+                <?php if($_SESSION['id']) :?>
                 <div class="card">
-                    <div class="card-header">
-                        Tags
-                    </div>
-                    <div class="card-body d-flex-wrap">
-                        <div class="badge bg-secondary">#nguoiyeucu</div>
-                        <div class="badge bg-primary">#nihon</div>
-                        <div class="badge bg-danger">#newyear</div>
-                        <div class="badge bg-success">#shop</div>
-                        <div class="badge bg-secondary">#2021</div>
-                        <div class="badge bg-warning">#corona</div>
-                        <div class="badge bg-secondary">#prtimes</div>
-                        <div class="badge bg-secondary">#tayori</div>
+                    <div class="card-body new-post">
+                        <a class="create-post-btn" href="/posts/create"><i class="fa fa-plus"></i> Create new post</a>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-8">
+                <br/>
+                <?php endif?>
                 <?php if(is_array($data['posts'])):?>
                 <?php foreach ($data['posts'] as $key) : ?>
                     <div id="<?php echo 'post-'.$key['id']  ?>" class="post">
@@ -73,7 +65,7 @@
                             </div>
                             <div class="post__header-info">
                                 <div class="post__header-title"><?php echo $key['user_name']; ?></div>
-                                <div class="post__header-time"><?php echo $key['user_email']; ?></div>
+                                <div class="post__header-time"><i class="fa fa-clock-o"></i> <?php echo $key['created_at']; ?></div>
                             </div>
                         </div>
                         <div class="post__body">
@@ -96,6 +88,23 @@
                     </div>
                 <?php endforeach; ?>
                 <?php endif;?>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        Tags
+                    </div>
+                    <div class="card-body d-flex-wrap">
+                        <div class="badge bg-secondary">#nguoiyeucu</div>
+                        <div class="badge bg-primary">#nihon</div>
+                        <div class="badge bg-danger">#newyear</div>
+                        <div class="badge bg-success">#shop</div>
+                        <div class="badge bg-secondary">#2021</div>
+                        <div class="badge bg-warning">#corona</div>
+                        <div class="badge bg-secondary">#prtimes</div>
+                        <div class="badge bg-secondary">#tayori</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

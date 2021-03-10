@@ -12,7 +12,7 @@
 <form>
     <div class="row">
         <div class="col-4">
-            <a class="btn btn-primary" href="/"><i class="fa fa-home"></i> Go to homepage</a>
+            <a href="/"><i class="fa fa-home"></i> Go to homepage</a>
             <hr>
             <h3 class="text-center">Post</h3><br>
             <div class="mb-3 row">
