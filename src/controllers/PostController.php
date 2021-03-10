@@ -172,16 +172,24 @@ class PostController extends Controller {
 
     public function delete($id)
     {
-        $delete = $this->model("Post")->query("
-            DELETE FROM posts WHERE id='$id';
-        ");
-        if(!$delete) {
-            $this->response(400, [
+        $error = '';
+        $user_id = $_SESSION['id'];
+        if(!$user_id) {
+            $error = "Unauthenticated";
+            return $this->response(400, [
                 "ok" => false,
-                "message" => "delete faile"
+                "message" => $error
+            ]);
+        }
+        $delete = $this->model("Post")->query("DELETE FROM posts WHERE id='$id' AND user_id = $user_id;");
+        if(!$delete) {
+            $error = "delete post faile";
+            return $this->response(400, [
+                "ok" => false,
+                "message" => $error
             ]);
         }else{
-            $this->response(200, [
+            return $this->response(200, [
                 "ok" => true,
                 "message" => "delete success"
             ]);
