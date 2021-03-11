@@ -63,6 +63,15 @@ class PostServices extends Services {
         return $post;
     }
 
+    public function getByUserId($userId){
+        $query = "SELECT * FROM posts WHERE user_id=$userId";
+        $cmd = $this->model->query($query);
+        if(!$cmd) {
+            return false;
+        }
+        return $cmd->fetchAll();
+    }
+
     public function getById(int $id, $edit=false){
         $postId = $id;
         $userId = $_SESSION['id'];
@@ -142,8 +151,18 @@ class PostServices extends Services {
         return true;
     }
 
-    public function delete($id, $userId){
-        $query = "DELETE FROM posts WHERE id='$id' AND user_id = $userId";
+    public function delete(int $id, int $userId){
+        $posts = $this->getByUserId($userId);
+        if(!is_array($posts)){
+            return false;
+        }
+        $posts = array_map(function($p){
+            return $p['id'];
+        }, $posts);
+        if(!is_numeric(array_search($id, $posts))){
+            return false;
+        }
+        $query = "DELETE FROM posts WHERE id='$id'";
         $comd = $this->model->query($query);
 
         if(!$comd){
