@@ -1,4 +1,8 @@
 <?php
+include_once __DIR__."/../services/PostServices.php";
+include_once __DIR__."/../services/TagServices.php";
+include_once __DIR__."/../services/UserServices.php";
+
 class AuthController extends Controller {
     public function index() {
         $data = [];
@@ -11,30 +15,13 @@ class AuthController extends Controller {
                 ]
             ];
         }
-
-        $posts = $this->model("Post")->query("
-                SELECT 
-                    posts.id as id,
-                    posts.title as title,
-                    posts.content as content,
-                    images.url as thumbnail,
-                    users.id as user_id,
-                    users.name as user_name,
-                    users.email as user_email,
-                    posts.created_at as created_at
-                FROM posts
-                LEFT OUTER JOIN users
-                ON posts.user_id = users.id
-                LEFT OUTER JOIN images
-                ON posts.thumbnail = images.id
-                ORDER BY posts.created_at DESC;
-            ")->fetchAll();
-
-        $tags = $this->model("Tag")->find();
+        $postService = new PostServices();
+        $posts = $postService->getAll();
+        $tagService = new TagServices();
+        $tags = $tagService->getAll();
         if($tags){
             $data['tags'] = $tags;
         }
-
         if($posts) {
             $data['posts'] = $posts;
         }
@@ -49,13 +36,14 @@ class AuthController extends Controller {
     public function login() {
         $error = '';
         $user = '';
-        $email = $_REQUEST['email'];
-        $password = $_REQUEST['password'];
+        $email = (string)$_REQUEST['email'];
+        $password = (string)$_REQUEST['password'];
         if(!$email || !$password){
             $error = 'Email or password required';
         }
         if(!$error){
-            $user = $this->model("User")->findOne("email='$email'");
+            $userService = new UserServices();
+            $user = $userService->getByEmail($email);
             if(!$user || !password_verify($password, $user['password'])){
                 $error = "Email or password invalid";
             }
@@ -88,17 +76,23 @@ class AuthController extends Controller {
         $error = '';
         $name = $_REQUEST['name'];
         $email = $_REQUEST['email'];
+        $password = $_POST['password'];
         if($_REQUEST['password'] !== $_REQUEST['confirm']){
             $error = "Password confirm invalid";
         }
-        $checkEmail = $this->model("User")->find("email='$email'");
+        $userService = new UserServices();
+        $checkEmail = $userService->getByEmail($email);
 
-        if(count($checkEmail) > 0){
+        if($checkEmail){
             $error = "Email used";
         }
-        $password= password_hash($_REQUEST['password'], PASSWORD_DEFAULT);
+
         if(!$error){
-            $data = $this->model("User")->query("INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password');");
+            $data = $userService->create([
+                "name" => $name,
+                "email" => $email,
+                "password" => $password
+            ]);
             if(!$data){
                 $error = "Cannot sign up, please try again";
             }

@@ -7,7 +7,23 @@ class PostServices extends Services {
     }
 
     public function getAll(){
-        $data = $this->model->find();
+        $data = $this->model->query("
+                SELECT 
+                    posts.id as id,
+                    posts.title as title,
+                    posts.content as content,
+                    images.url as thumbnail,
+                    users.id as user_id,
+                    users.name as user_name,
+                    users.email as user_email,
+                    posts.created_at as created_at
+                FROM posts
+                LEFT OUTER JOIN users
+                ON posts.user_id = users.id
+                LEFT OUTER JOIN images
+                ON posts.thumbnail = images.id
+                ORDER BY posts.created_at DESC;
+            ")->fetchAll();
         return $data;
     }
 
@@ -78,7 +94,7 @@ class PostServices extends Services {
         return $post->fetch();
     }
 
-    public function update(int $postId, $post=[]){
+    public function update(int $postId, array $post=[]){
         $title = $post['title'];
         $content = $post['content'];
         $user_id = $post['user_id'];
@@ -111,6 +127,19 @@ class PostServices extends Services {
             return false;
         }
         return $data;
+    }
+
+    public function updateThumbnail($postId, $imageId){
+        $query = "UPDATE posts SET thumbnail = :imageId WHERE id = :postId";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+        $set->bindParam(':imageId', $imageId, PDO::PARAM_INT);
+        $d = $set->execute();
+        if(!$d){
+            return false;
+        }
+        return true;
     }
 
     public function delete($id, $userId){

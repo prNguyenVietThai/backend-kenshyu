@@ -2,17 +2,6 @@
 include_once __DIR__."/../services/TagServices.php";
 
 class TagController extends Controller {
-    public $model, $pdo;
-    public function __construct()
-    {
-        $this->model = $this->model("Tag");
-        $this->pdo = $this->model->db->pdo;
-    }
-
-    public function index(){
-        $db = $this->model->find();
-        return $db;
-    }
 
     public function store(){
         if($_SESSION['id']){

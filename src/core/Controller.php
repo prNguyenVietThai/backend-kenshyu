@@ -2,15 +2,7 @@
     class Controller {
         public function __construct()
         {
-            $this->db = new Database();
-        }
 
-        public function model($model) {
-            require_once './models/' . $model . '.php';
-            $newModel = new $model();
-            $newModel->modelName = strtolower($model)."s";
-
-            return $newModel;
         }
 
         public function view($view, $data = []) {

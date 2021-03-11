@@ -36,6 +36,7 @@ class PostController extends Controller {
 
         if(!$error){
             $postService = new PostServices();
+            $imageService = new ImageServices();
             $post = $postService->create([
                 "title" => $title,
                 "content" => $content,
@@ -65,25 +66,13 @@ class PostController extends Controller {
 
                         if(in_array($fileExtension, $fileExtensions)){
                             move_uploaded_file($fileTmpPath, ".".$dest_path);
+                            $image = $imageService->create([
+                                "url" => $dest_path,
+                                "post_id" => $postId
+                            ]);
                             if($i == 0){
-                                $imageModel = $this->model("Image");
-                                $iconn = $imageModel->db->dbHandler;
-                                $iconn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                $image = $iconn->query("
-                                    INSERT INTO images (url, post_id)
-                                    VALUES ('$dest_path', $postId);
-                                ");
-                                $imageId = $iconn->lastInsertId();
-                                $update = $this->model("Post")->query("
-                                    UPDATE posts
-                                    SET thumbnail = $imageId
-                                    WHERE id = $postId
-                                ");
-                            }else{
-                                $this->model("Image")->query("
-                                    INSERT INTO images (url, post_id)
-                                    VALUES ('$dest_path', $postId);
-                                ");
+                                $imageId = $image['id'];
+                                $postService->updateThumbnail($postId, $imageId);
                             }
                         }
                     }
