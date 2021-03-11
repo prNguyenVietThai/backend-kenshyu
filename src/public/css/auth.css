@@ -1,8 +1,9 @@
 body {
+    width: 100%;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
 }
 
 .login {
@@ -19,6 +20,7 @@ body {
     font-weight: bold;
     font-size: 36px;
     text-align: center;
+    color: #888CCF;
 }
 
 .login__logo {
@@ -40,7 +42,7 @@ body {
 
 .login__body button {
     width: 100%;
-    background-color: #57b864;
+    background: linear-gradient(to bottom, #FE5699, #EDE54B);
     border: 1px solid #f1f1f1;
     padding: 10px 20px;
     color: #fff;
@@ -48,16 +50,16 @@ body {
     border-radius: 10px;
     font-size: 18px;
     cursor: pointer;
-    transition: background-color .5s;
 }
 .login__body button:hover {
-    background-color: black;
+    background: linear-gradient(to bottom, #EDE54B, #FE5699);
+    transition: background .5s;
 }
 
 .login-btn {
     padding: 5px 12px;
     border-radius: 5px;
-    background-color: #57b864;
+    background: linear-gradient(to bottom, #FE5699, #EDE54B);
     color: #fff;
 }
 
@@ -95,7 +97,7 @@ body {
 }
 
 .signup .btn-signup {
-    color: #57b864;
+    color: #FE5699;
     cursor: pointer;
 }
 

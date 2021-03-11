@@ -9,8 +9,8 @@
 <div class="login">
     <div class="login__header">
         <h3 class="login__title">LOGIN</h3>
-        <div class="login__logo" >
-            <img src="https://picsum.photos/id/237/200">
+        <div class="login__logo">
+            <img src="/public/logo.png">
         </div>
     </div>
     <?php if($data['error']): ?>

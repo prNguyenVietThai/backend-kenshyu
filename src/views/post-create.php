@@ -12,12 +12,41 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
-<body>
-<div class="container">
-    <br>
+<body style="background: #e1e1e1">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img style="width: 40px" src="/public/user-icon.png">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            </ul>
+            <div class="d-flex">
+                <?php if(isset($_SESSION) && $_SESSION["name"] && $_SESSION["email"]): ?>
+                    <a href="/logout" class="btn btn-outline-danger">Logout</a>
+                <?php else: ?>
+                    <a href="/login" class="btn btn-outline-success" style="margin-right: 5px;">Login</a>
+                    <a href="/signup" class="btn btn-outline-primary">Signup</a>
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container" style="padding: 50px 0px;">
     <?php if(isset($_SESSION) && $_SESSION['id']) :?>
         <div class="row">
-            <div class="col-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="col-4"">
                 <?php if(isset($data['ok'])): ?>
                     <script>
                         Swal.fire({
@@ -34,65 +63,47 @@
                     </script>
                 <?php endif ?>
 
-                <a href="/"><i class="fa fa-home"></i> Go to homepage</a>
-                <hr>
-                <h3 class="text-center">Post</h3><br>
-                <form enctype="multipart/form-data" action="/posts/create" method="POST">
-                    <div class="mb-3 row">
-                        <label class="col-form-label"><b>Title</b></label>
-                        <div class="col-12">
-                            <input type="text" class="form-control" name="title">
-                        </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Create new post</h4>
                     </div>
-                    <div class="mb-3 row">
-                        <label class="col-form-label"><b>Description</b></label>
-                        <div class="col-12">
-                            <textarea type="text" class="form-control" name="content" style="height: 150px"></textarea>
-                        </div>
+                    <div class="card-body">
+                        <form enctype="multipart/form-data" action="/posts/create" method="POST">
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Title</b></label>
+                                <div class="col-12">
+                                    <input type="text" class="form-control" name="title">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Description</b></label>
+                                <div class="col-12">
+                                    <textarea type="text" class="form-control" name="content" style="height: 150px"></textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Use tags</b></label>
+                                <div class="col-12">
+                                    <select id="tags" class="form-control" name="tags[]" multiple="multiple">
+                                        <?php foreach ($data['tags'] as $tag):?>
+                                            <option value="<?php echo $tag['id'] ?>"><?php echo $tag['title'] ?></option>
+                                        <?php endforeach?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" onchange="loadFile(event)" name="images[]" accept="image/x-png,image/gif,image/jpeg" multiple>
+                            </div>
+                            <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </form>
                     </div>
-                    <div class="mb-3 row">
-                        <label class="col-form-label"><b>Use tags</b></label>
-                        <div class="col-12">
-                            <select id="tags" class="form-control" name="usetags[]" multiple="multiple">
-                                <option value="AL">Alabama</option>
-                                <option value="WY">Wyoming</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label class="col-form-label"><b>Create new tags</b> Ex: #something, v.v.</label>
-                        <div class="col-12">
-                            <input type="text" class="form-control" name="tags">
-                        </div>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="file" class="form-control" onchange="loadFile(event)" name="images[]" accept="image/x-png,image/gif,image/jpeg" multiple>
-                    </div>
-                    <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
-                    <button type="submit" class="btn btn-success">Save</button>
-                </form>
-                <br>
+                </div>
             </div>
             <div class="col-8">
                 <div id="image-list">
                     <img id="output" style="width: 100%;"/>
                 </div>
-
-                <script>
-                    let loadFile = function(event) {
-                        let image_list = document.getElementById("image-list");
-                        image_list.innerHTML = "";
-                        for (let i=0; i < event.target.files.length; i++ ){
-                            let src = URL.createObjectURL(event.target.files[i]);
-                            let image = document.createElement("img");
-                            image.src = src;
-                            image.style.maxWidth = "100%";
-                            image.style.display = "block";
-                            image.style.margin = "20px auto";
-                            image_list.appendChild(image);
-                        }
-                    };
-                </script>
             </div>
         </div>
     <?php else:?>
@@ -104,20 +115,20 @@
     $(document).ready(function() {
         $('#tags').select2();
     });
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('#blah')
-                    .attr('src', e.target.result)
-                    .width(150)
-                    .height(200);
-            };
-
-            reader.readAsDataURL(input.files[0]);
+    let loadFile = function(event) {
+        let image_list = document.getElementById("image-list");
+        image_list.innerHTML = "";
+        for (let i=0; i < event.target.files.length; i++ ){
+            let src = URL.createObjectURL(event.target.files[i]);
+            let image = document.createElement("img");
+            image.src = src;
+            image.classList.add("img-fluid");
+            image.classList.add("mx-auto");
+            image.classList.add("d-block");
+            image.classList.add("img-thumbnail");
+            image_list.appendChild(image);
         }
-    }
+    };
 </script>
 </body>
 </html>

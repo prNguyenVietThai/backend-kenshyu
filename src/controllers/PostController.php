@@ -1,4 +1,8 @@
 <?php
+include_once __DIR__."/../services/TagServices.php";
+include_once __DIR__."/../services/PostServices.php";
+include_once __DIR__."/../services/ImageServices.php";
+
 class PostController extends Controller {
     public function __construct() {
         $this->model = $this->model("Post");
@@ -11,7 +15,11 @@ class PostController extends Controller {
 
     public function create()
     {
-        $this->view("post-create");
+        $tagServices = new TagServices();
+        $tags = $tagServices->getAll();
+        $this->view("post-create", [
+            "tags" => $tags
+        ]);
     }
 
     public function store()
@@ -20,23 +28,28 @@ class PostController extends Controller {
         $title = $_POST['title'];
         $content = $_POST['content'];
         $user_id = $_POST['user_id'];
+        $tags = $_POST['tags'];
 
         if(!$title || !$content || !$user_id){
             $error = 'information invalid';
         }
 
         if(!$error){
-            $postModel = $this->model("Post");
-            $conn = $postModel->db->dbHandler;
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $post = $conn->query("
-                    INSERT INTO posts (title, content, user_id)
-                    VALUES ('$title', '$content', '$user_id');
-                ");
-            $postId = $conn->lastInsertId();
+            $postService = new PostServices();
+            $post = $postService->create([
+                "title" => $title,
+                "content" => $content,
+                "user_id" => $user_id
+            ]);
+
             if(!$post){
                 $error = 'cannot create post, try again later';
             }else{
+                $postId = $post["id"];
+                $tagService = new TagServices();
+                foreach ($tags as $tagId){
+                    $tagService->addPostTag($postId, $tagId);
+                }
                 if($_FILES['images']['name'][0]) {
                     $fileExtensions = ["jpeg", "jpg", "png"];
 
@@ -91,63 +104,42 @@ class PostController extends Controller {
         }
     }
 
-    private function getPostInfo($id, $edit=false)
-    {
-        $postId = $id;
-        $userId = $_SESSION['id'];
-        if(!$userId){
-            return [
-                "ok" => false,
-                "message" => "Unauthenticated"
-            ];
-        }
-        $query = "
-            SELECT 
-                posts.id as id, 
-                title, 
-                content, 
-                thumbnail, 
-                user_id, 
-                users.name as user_name, 
-                users.email as user_email,
-                posts.created_at as created_at
-            FROM posts
-            LEFT OUTER JOIN users
-            ON posts.user_id = users.id
-            WHERE posts.id = $postId
-        ";
-        if($edit){
-            $query = $query." AND posts.user_id = $userId";
-        }
-
-        $post = $this->model("Post")->query($query)->fetch();
-        if(!$post){
-            return [
-                "ok" => false,
-                "message" => "Permission denied"
-            ];
-        }
-        $images = $this->model("Image")->query("SELECT * FROM images WHERE post_id = '$postId';")->fetchAll();
-
-        return [
-            "post" => $post,
-            "images" => $images
-        ];
-    }
-
     public function show($id)
     {
-        $data = $this->getPostInfo($id);
-        $this->view("post-show", $data);
+        $postService = new PostServices();
+        $post = $postService->getById($id);
+        $tagService = new TagServices();
+        $tags = $tagService->getByPostId($id);
+        $imageService = new ImageServices();
+        $images = $imageService->getByPostId($id);
+        $this->view("post-show", [
+            "post" => $post,
+            "images" => $images,
+            "tags" => $tags
+        ]);
     }
 
     public function edit($id)
     {
-        $data = $this->getPostInfo($id, true);
-        $this->view("post-edit", $data);
+        $postService = new PostServices();
+        $post = $postService->getById($id, true);
+        $tagService = new TagServices();
+        $tags = $tagService->getAll();
+        $tagsOfPost = $tagService->getByPostId($id);
+        $imageService = new ImageServices();
+        $images = $imageService->getByPostId($id);
+        $this->view("post-edit", [
+            "post" => $post,
+            "images" => $images,
+            "tags" => $tags,
+            "tagsOfPost" => $tagsOfPost
+        ]);
     }
 
     public function update($id){
+        $postService = new PostServices();
+        $tagService = new TagServices();
+        $imageService = new ImageServices();
         $error = '';
 
         $postId = (int)$id;
@@ -156,43 +148,54 @@ class PostController extends Controller {
             $error = "Information invalid";
         }
 
-        $title = (string)$_POST['title'];
-        $content = (string)$_POST['content'];
+        $ptitle = (string)$_POST['title'];
+        $pcontent = (string)$_POST['content'];
+        $ptags = (array)$_POST['tags'];
 
-        if(!$title || !$content){
+        if(!$ptitle || !$pcontent){
             $error = 'Title or content not null';
         }
         if(!$error){
-            $data = $this->model("Post")->query("
-                UPDATE posts
-                SET title = '$title', content = '$content'
-                WHERE id = $postId AND user_id = $userId;
-            ");
+            $data = $postService->update($postId, [
+                "title" => $ptitle,
+                "content" => $pcontent,
+                "tags" => $ptags,
+                "user_id" => $userId
+            ]);
             if(!$data){
                 $error = "Edit post faile";
             }
         }
 
-        $post = $this->getPostInfo($postId);
+        $post = $postService->getById($id);
+        $tags = $tagService->getAll();
+        $tagsOfPost = $tagService->getByPostId($id);
+        $images = $imageService->getByPostId($id);
+
         if($error) {
             return $this->view("post-edit", [
                 "ok" => false,
                 "message" => $error,
-                "post" => $post["post"],
-                "images" => $post["images"]
+                "post" => $post,
+                "images" => $images,
+                "tags" => $tags,
+                "tagsOfPost" => $tagsOfPost
             ]);
         }else{
             return $this->view("post-edit", [
                 "ok" => true,
                 "message" => "update post successfully",
-                "post" => $post["post"],
-                "images" => $post["images"]
+                "post" => $post,
+                "images" => $images,
+                "tags" => $tags,
+                "tagsOfPost" => $tagsOfPost
             ]);
         }
     }
 
     public function delete($id)
     {
+        $postService = new PostServices();
         $error = '';
         $user_id = $_SESSION['id'];
         if(!$user_id) {
@@ -202,7 +205,7 @@ class PostController extends Controller {
                 "message" => $error
             ]);
         }
-        $delete = $this->model("Post")->query("DELETE FROM posts WHERE id='$id' AND user_id = $user_id;");
+        $delete = $postService->delete($id, $user_id);
         if(!$delete) {
             $error = "delete post faile";
             return $this->response(400, [

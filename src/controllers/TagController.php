@@ -1,4 +1,5 @@
 <?php
+include_once __DIR__."/../services/TagServices.php";
 
 class TagController extends Controller {
     public $model, $pdo;
@@ -10,7 +11,7 @@ class TagController extends Controller {
 
     public function index(){
         $db = $this->model->find();
-        var_dump($db);
+        return $db;
     }
 
     public function store(){
@@ -24,15 +25,12 @@ class TagController extends Controller {
                 ]);
             }
 
-            $query = "INSERT INTO tags(title, description) value(:title, :description);";
-            $conn = $this->pdo;
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $set = $conn->prepare($query);
-            $set->bindParam(':title', $title, PDO::PARAM_STR);
-            $set->bindParam(':description', $description, PDO::PARAM_STR);
-            $set->execute();
-            $tagId = $conn->lastInsertId();
-            $tag = $this->model("Tag")->findOne("id='$tagId'");
+            //create new tag
+            $tagService = new TagServices();
+            $tag = $tagService->create([
+                "title" => $title,
+                "description" => $description
+            ]);
 
             return $this->response(200, [
                 "ok" => true,

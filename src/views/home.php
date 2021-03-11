@@ -15,24 +15,17 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <img style="width: 40px" src="/public/user-icon.png">
+                <img style="width: 40px" src="/public/logo.png">
             </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <?php if(isset($_SESSION) && $_SESSION['name']): ?>
+                    Hi, <strong><?php echo $_SESSION['name'] ?></strong>
+                <?php endif?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <?php if($_SESSION['id']) :?>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/posts">My posts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/posts/create">Up post</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/profile">Profile</a>
-                        </li>
-                    <?php endif?>
                 </ul>
                 <div class="d-flex">
                     <?php if(isset($_SESSION) && $_SESSION["name"] && $_SESSION["email"]): ?>
@@ -47,14 +40,33 @@
     </nav>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8">
-                <?php if($_SESSION['id']) :?>
+            <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-body new-post">
-                        <a class="create-post-btn" href="/posts/create"><i class="fa fa-plus"></i> Create new post</a>
+                    <div class="card-header">
+                        Tags
+                    </div>
+                    <div id="tag-list" class="card-body d-flex-wrap">
+                        <?php if(is_array($data['tags'])):?>
+                            <?php foreach ($data['tags'] as $tag):?>
+                                <div class="badge bg-secondary">#<?php echo $tag['title'] ?></div>
+                            <?php endforeach;?>
+                        <?php endif?>
                     </div>
                 </div>
-                <br/>
+                <?php if($_SESSION['id']): ?>
+                    <div class="tag-create">
+                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <i class="fa fa-plus"></i>
+                            Create new tag
+                        </button>
+                    </div>
+                <?php endif?>
+            </div>
+            <div class="col-lg-8">
+                <?php if($_SESSION['id']) :?>
+                <a class="btn btn-outline-secondary" href="/posts/create" style="width: 100%; margin-bottom: 30px">
+                    <i class="fa fa-plus"></i> Create new post
+                </a>
                 <?php endif?>
                 <?php if(is_array($data['posts'])):?>
                 <?php foreach ($data['posts'] as $key) : ?>
@@ -65,7 +77,7 @@
                             </div>
                             <div class="post__header-info">
                                 <div class="post__header-title"><?php echo $key['user_name']; ?></div>
-                                <div class="post__header-time"><i class="fa fa-clock-o"></i> <?php echo $key['created_at']; ?></div>
+                                <time class="post__header-time"><i class="fa fa-clock-o"></i> <?php echo $key['created_at']; ?></time>
                             </div>
                         </div>
                         <div class="post__body">
@@ -80,36 +92,14 @@
                             </div>
                         </div>
                         <div class="post__footer">
-                            <a class="btn btn-outline-primary" href="/posts/show/<?php echo $key['id']; ?>" style="margin-right: 5px">Detail</a>
+                            <a class="text-success" href="/posts/show/<?php echo $key['id']; ?>" style="margin-right: 5px"><i class="fa fa-book"> See more </i></a>
                             <?php if($key['user_id'] == $_SESSION['id']): ?>
-                                <button class="btn btn-outline-danger" onclick="deletePost(<?php echo $key['id'] ?>)">Delete</button>
+                                <a class="text-danger" onclick="deletePost(<?php echo $key['id'] ?>)"><i class="fa fa-trash"> Delete </i></a>
                             <?php endif ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
                 <?php endif;?>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        Tags
-                    </div>
-                    <div id="tag-list" class="card-body d-flex-wrap">
-                        <?php if(is_array($data['tags'])):?>
-                        <?php foreach ($data['tags'] as $tag):?>
-                            <div class="badge bg-secondary">#<?php echo $tag['title'] ?></div>
-                        <?php endforeach;?>
-                        <?php endif?>
-                    </div>
-                </div>
-                <?php if($_SESSION['id']): ?>
-                <div class="tag-create">
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                        <i class="fa fa-plus"></i>
-                        Create new tag
-                    </button>
-                </div>
-                <?php endif?>
             </div>
         </div>
     </div>

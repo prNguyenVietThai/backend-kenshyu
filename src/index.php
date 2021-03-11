@@ -3,6 +3,7 @@
 
     include_once './core/Database.php';
     include_once './core/Model.php';
+    include_once './core/Services.php';
     include_once './core/Controller.php';
     include_once './core/Route.php';
 

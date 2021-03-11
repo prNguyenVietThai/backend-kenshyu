@@ -10,7 +10,7 @@
     <div class="login__header">
         <h3 class="login__title">SIGN UP</h3>
         <div class="login__logo" >
-            <img src="https://picsum.photos/id/237/200">
+            <img src="/public/logo.png">
         </div>
     </div>
     <?php if($data['error']): ?>

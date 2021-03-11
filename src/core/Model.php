@@ -5,7 +5,9 @@
 
         public function __construct()
         {
-            $this->db = new Database();
+            $conn = new Database();
+            $this->db = $conn;
+            $this->pdo = $conn->pdo;
         }
 
         public function find(string $options = "")
@@ -19,6 +21,15 @@
                 return false;
             }
             return $data->fetchAll();
+        }
+
+        public function findById(int $id)
+        {
+            $data = $this->query("SELECT * FROM $this->modelName WHERE id = $id");
+            if(!$data) {
+                return false;
+            }
+            return $data->fetch();
         }
 
         public function findOne(string $options)
