@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </head>
-<body style="background: #e1e1e1">
+<body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -39,7 +39,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                <li class="breadcrumb-item active" aria-current="page">Show</li>
             </ol>
         </nav>
     </div>
@@ -76,17 +76,17 @@
                         </div>
                     </div>
                 </div>
+                <?php if($_SESSION['id'] && $data['post']['user_id'] == $_SESSION['id']): ?>
                 <div class="card-footer">
-                    <?php if($data['post']['user_id'] == $_SESSION['id']): ?>
-                        <a href="/posts/edit/<?php echo $data['post']['id'] ?>" class="btn btn-primary">Edit</a>
-                    <?php endif ?>
+                    <a href="/posts/edit/<?php echo $data['post']['id'] ?>" class="btn btn-primary">Edit</a>
                 </div>
+                <?php endif ?>
             </div>
         </div>
         <div class="col-8 d-flex-wrap">
             <?php if(is_array($data['images'])): ?>
                 <?php foreach ($data['images'] as $key) : ?>
-                    <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
+                    <img class="img-thumbnail" style="width: 400px; height: 240px" src="<?php echo $key['url']; ?>">
                 <?php endforeach;?>
             <?php endif?>
         </div>

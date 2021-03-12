@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
-<body style="background: #e1e1e1">
+<body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -125,10 +125,9 @@
             let src = URL.createObjectURL(event.target.files[i]);
             let image = document.createElement("img");
             image.src = src;
-            image.classList.add("img-fluid");
-            image.classList.add("mx-auto");
-            image.classList.add("d-block");
             image.classList.add("img-thumbnail");
+            image.style.width = "400px";
+            image.style.height = "240px";
             image_list.appendChild(image);
         }
     };

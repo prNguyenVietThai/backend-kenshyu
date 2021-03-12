@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
-<body style="background: #e1e1e1">
+<body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -114,7 +114,7 @@
             </div>
             <div class="col-8 d-flex-wrap">
                 <?php foreach ($data['images'] as $key) : ?>
-                    <img class="img-fluid mx-auto d-block img-thumbnail" src="<?php echo $key['url']; ?>">
+                    <img class="img-thumbnail" style="width: 400px; height: 240px" src="<?php echo $key['url']; ?>">
                 <?php endforeach;?>
             </div>
         <?php else: ?>

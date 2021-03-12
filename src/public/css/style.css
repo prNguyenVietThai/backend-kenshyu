@@ -1,7 +1,6 @@
 body {
     width: 100%;
     min-height: 100vh;
-    background: #e1f1f1;
 }
 
 .container {
@@ -77,11 +76,11 @@ body {
     width: 100%;
     background-color: #fff;
     margin-bottom: 80px;
+    border: 1px solid #d1d1d1;
 }
 
 .post__header {
-    padding: 18px 30px;
-    border-bottom: 1px solid #e1e1e1;
+    padding: 10px;
     display: flex;
     align-items: center;
 }
@@ -93,7 +92,7 @@ body {
 }
 
 .post__header-info {
-    padding: 10px;
+    padding: 5px;
 }
 
 .post__header-title {
@@ -103,13 +102,12 @@ body {
 }
 
 .post__header-time{
-    line-height: 24px;
-    font-size: 14px;
+    font-size: 12px;
     color: #a1a1a1;
 }
 
 .post__body {
-    padding: 30px;
+    padding: 10px 20px;
 }
 
 .post__body-title {
@@ -118,6 +116,7 @@ body {
 }
 
 .post__body-thumbnail {
+    margin-top: 20px;
     width: 100%;
 }
 
@@ -144,8 +143,7 @@ body {
 
 .post__footer {
     display: flex;
-    border-top: 1px solid #e1e1e1;
-    padding: 18px 30px;
+    padding: 10px 20px;
 }
 
 .post__footer-action {
