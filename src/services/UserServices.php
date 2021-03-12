@@ -5,22 +5,30 @@ class UserServices extends Services {
     }
 
     public function getById(int $id){
-        $query = "SELECT * FROM users WHERE id='$id'";
-        $user = $this->model->query($query);
-        if(!$user){
+        $query = "SELECT * FROM users WHERE id=:id";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':id', $id, PDO::PARAM_INT);
+        $set->execute();
+        if(!$set){
             return false;
         }
-        return $user->fetch();
+
+        return $set->fetch();
     }
 
     public function getByEmail(string $email){
-        $query = "SELECT * FROM users WHERE email='$email'";
-        $comd = $this->model->query($query);
-        if(!$comd){
+        $query = "SELECT * FROM users WHERE email=:email";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':email', $email, PDO::PARAM_STR);
+        $set->execute();
+
+        if(!$set){
             return false;
         }
 
-        return $comd->fetch();
+        return $set->fetch();
     }
 
     public function create(array $user=[]){
