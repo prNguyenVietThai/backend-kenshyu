@@ -11,9 +11,16 @@ class ImageServices extends Services {
     }
 
     public function getByPostId(int $postId){
-        $images = $this->model->query("SELECT * FROM images WHERE post_id = '$postId';")->fetchAll();
+        $query = "SELECT * FROM images WHERE post_id = :post_id;";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':post_id', $postId, PDO::PARAM_INT);
+        $set->execute();
 
-        return $images;
+        if(!$set){
+            return false;
+        }
+        return $set->fetchAll();
     }
 
     public function create(array $image=[]){

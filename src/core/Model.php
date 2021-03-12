@@ -25,11 +25,16 @@
 
         public function findById(int $id)
         {
-            $data = $this->query("SELECT * FROM $this->modelName WHERE id = $id");
-            if(!$data) {
+            $query = "SELECT * FROM $this->modelName WHERE id = :id";
+            $conn = $this->pdo;
+            $set = $conn->prepare($query);
+            $set->bindParam(":id", $id);
+            $set->execute();
+
+            if(!$set) {
                 return false;
             }
-            return $data->fetch();
+            return $set->fetch();
         }
 
         public function findOne(string $options)

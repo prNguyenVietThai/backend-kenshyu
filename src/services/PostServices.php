@@ -28,18 +28,27 @@ class PostServices extends Services {
     }
 
     public function addPostTag(int $postId, int $tagId){
-        $query = "INSERT INTO post_tag(post_id, tag_id) VALUE ($postId, $tagId)";
-        $conn = $this->model->query($query);
-        if(!$conn){
+        $query = "INSERT INTO post_tag(post_id, tag_id) VALUE (:postId, :tagId)";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+        $set->bindParam(':tagId', $tagId, PDO::PARAM_INT);
+        $set->execute();
+
+        if(!$set){
             return false;
         }
         return true;
     }
 
     public function deletePostTag(int $postId, int $tagId){
-        $query = "DELETE FROM post_tag WHERE post_id=$postId AND tag_id=$tagId";
-        $conn = $this->model->query($query);
-        if(!$conn){
+        $query = "DELETE FROM post_tag WHERE post_id=:postId AND tag_id=:tagId";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+        $set->bindParam(':tagId', $tagId, PDO::PARAM_INT);
+        $set->execute();
+        if(!$set){
             return false;
         }
         return true;
@@ -64,12 +73,15 @@ class PostServices extends Services {
     }
 
     public function getByUserId($userId){
-        $query = "SELECT * FROM posts WHERE user_id=$userId";
-        $cmd = $this->model->query($query);
-        if(!$cmd) {
+        $query = "SELECT * FROM posts WHERE user_id=:userId";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $set->execute();
+        if(!$set) {
             return false;
         }
-        return $cmd->fetchAll();
+        return $set->fetchAll();
     }
 
     public function getById(int $id, $edit=false){
@@ -91,16 +103,25 @@ class PostServices extends Services {
             FROM posts
             LEFT OUTER JOIN users
             ON posts.user_id = users.id
-            WHERE posts.id = $postId
+            WHERE posts.id = :postId
         ";
         if($edit){
-            $query = $query." AND posts.user_id = $userId";
+            $query = $query." AND posts.user_id = :userId";
         }
-        $post = $this->model->query($query);
-        if(!$post) {
+
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+
+        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+        if($edit){
+            $set->bindParam(':userId', $userId, PDO::PARAM_INT);
+        }
+        $set->execute();
+
+        if(!$set) {
             return false;
         }
-        return $post->fetch();
+        return $set->fetch();
     }
 
     public function update(int $postId, array $post=[]){
@@ -127,15 +148,21 @@ class PostServices extends Services {
 
         $query = "
             UPDATE posts
-            SET title = '$title', content = '$content'
-            WHERE id = $postId AND user_id = $user_id;
+            SET title = :title, content = :content
+            WHERE id = :postId AND user_id = :userId;
         ";
-        $data = $this->model->query($query);
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':title', $title, PDO::PARAM_STR);
+        $set->bindParam(':content', $content, PDO::PARAM_STR);
+        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+        $set->bindParam(':userId', $user_id, PDO::PARAM_INT);
+        $set->execute();
 
-        if(!$data) {
+        if(!$set) {
             return false;
         }
-        return $data;
+        return true;
     }
 
     public function updateThumbnail($postId, $imageId){
@@ -162,10 +189,13 @@ class PostServices extends Services {
         if(!is_numeric(array_search($id, $posts))){
             return false;
         }
-        $query = "DELETE FROM posts WHERE id='$id'";
-        $comd = $this->model->query($query);
+        $query = "DELETE FROM posts WHERE id=:id";
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':id', $id, PDO::PARAM_INT);
+        $set->execute();
 
-        if(!$comd){
+        if(!$set){
             return false;
         }
         return true;

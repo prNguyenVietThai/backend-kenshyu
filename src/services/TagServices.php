@@ -5,14 +5,24 @@
         }
 
         public function getAll(){
-            $data = $this->model->find();
-            return $data;
+            $query = "SELECT * FROM tags";
+            $conn = $this->model->pdo;
+            $set = $conn->prepare($query);
+            $set->execute();
+            if(!$set){
+                return false;
+            }
+            return $set->fetchAll();
         }
 
         public function addPostTag(int $postId, int $tagId){
-            $query = "INSERT INTO post_tag(post_id, tag_id) VALUE ($postId, $tagId)";
-            $conn = $this->model->query($query);
-            if(!$conn){
+            $query = "INSERT INTO post_tag(post_id, tag_id) VALUE (:post_id, :tag_id)";
+            $conn = $this->model->pdo;
+            $set = $conn->prepare($query);
+            $set->bindParam(':post_id', $postId, PDO::PARAM_INT);
+            $set->bindParam(':tag_id', $tagId, PDO::PARAM_INT);
+            $set->execute();
+            if(!$set){
                 return false;
             }
             return true;
@@ -42,13 +52,15 @@
                 ON tags.id = post_tag.tag_id
                 LEFT OUTER JOIN posts
                 ON posts.id = post_tag.post_id
-                WHERE post_tag.post_id = $postId;
+                WHERE post_tag.post_id = :postId;
             ";
-            $comd = $this->model->query($query);
-            if(!$comd){
+            $conn = $this->model->pdo;
+            $set = $conn->prepare($query);
+            $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+            $set->execute();
+            if(!$set){
                 return false;
             }
-            $tags = $comd->fetchAll();
-            return $tags;
+            return $set->fetchAll();
         }
     }
