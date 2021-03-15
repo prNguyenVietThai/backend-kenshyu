@@ -36,8 +36,9 @@ class AuthController extends Controller {
     public function login() {
         $error = '';
         $user = '';
-        $email = (string)$_REQUEST['email'];
-        $password = (string)$_REQUEST['password'];
+        $email = (string)$_POST['email'];
+        $password = (string)$_POST['password'];
+
         if(!$email || !$password){
             $error = 'Email or password required';
         }

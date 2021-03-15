@@ -1,11 +1,13 @@
-<?php   
+<?php
     session_start();
+    header('Content-Type: text/html; charset=UTF-8');
 
     include_once './core/Database.php';
     include_once './core/Model.php';
     include_once './core/Services.php';
     include_once './core/Controller.php';
     include_once './core/Route.php';
+    include_once './helpers/csrf.php';
 
     include_once "./route/web.php";
 
@@ -20,3 +22,4 @@
     }
 
     Route::request($uri, $http_method);
+

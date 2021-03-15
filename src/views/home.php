@@ -156,8 +156,6 @@
                         timer: 2000
                     });
                     let taglist = document.getElementById("tag-list");
-                    console.log(taglist);
-                    console.log(res);
                     let tag = document.createElement("div");
                     tag.appendChild(document.createTextNode(`#${res.tag.title}`))
                     tag.classList.add("badge");
@@ -176,8 +174,12 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    let form = new FormData();
+                    form.append("_method", "DELETE");
+                    form.append("token", "<?php echo CSRF::token()?>");
                     fetch("/posts/delete/"+id, {
-                        method: "DELETE"
+                        method: "POST",
+                        body: form
                     })
                     .then(res => res.json())
                     .then(res => {

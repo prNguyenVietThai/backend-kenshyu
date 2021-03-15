@@ -55,8 +55,8 @@ class PostServices extends Services {
     }
 
     public function create($post=[]){
-        $title = $post['title'];
-        $content = $post['content'];
+        $title = htmlspecialchars($post['title'], ENT_QUOTES, "UTF-8");
+        $content = htmlspecialchars($post['content'], ENT_QUOTES, "UTF-8");
         $user_id = $post['user_id'];
 
         $query = "INSERT INTO posts(title, content, user_id) value(:title, :content, :user_id);";
@@ -67,6 +67,7 @@ class PostServices extends Services {
         $set->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $set->execute();
         $postId = $conn->lastInsertId();
+        echo $postId;
         $post = $this->model->findById($postId);
 
         return $post;
@@ -125,8 +126,8 @@ class PostServices extends Services {
     }
 
     public function update(int $postId, array $post=[]){
-        $title = $post['title'];
-        $content = $post['content'];
+        $title = htmlspecialchars($post['title'] , ENT_QUOTES, "UTF-8");
+        $content = htmlspecialchars($post['content'], ENT_QUOTES, "UTF-8");
         $user_id = $post['user_id'];
         $tags = $post['tags']; // input array tags
 
@@ -134,16 +135,36 @@ class PostServices extends Services {
         $qtags = $tagService->getByPostId($postId);
         $qtags = array_map(function ($t){
             return $t['id'];
-        }, $qtags); // update array tags
+        }, $qtags);
 
+        // Init transaction
+        $conn = $this->model->pdo;
+        $conn->beginTransaction();
+
+        // Add post tag
+        $queryPostTag = "INSERT INTO post_tag(post_id, tag_id) VALUE (:postId, :tagId)";
         $addTags = array_diff($tags, $qtags);
         foreach ($addTags as $t){
-            $this->addPostTag($postId, $t);
+            $set = $conn->prepare($queryPostTag);
+            $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+            $set->bindParam(':tagId', $t, PDO::PARAM_INT);
+            if(!$set->execute()){
+                $conn->rollBack();
+                return false;
+            }
         }
 
+        // Delete post tag
+        $queryPostTagDelete = "DELETE FROM post_tag WHERE post_id=:postId AND tag_id=:tagId";
         $deleteTags = array_diff($qtags, $tags);
         foreach ($deleteTags as $t){
-            $this->deletePostTag($postId, $t);
+            $set = $conn->prepare($queryPostTagDelete);
+            $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+            $set->bindParam(':tagId', $t, PDO::PARAM_INT);
+            if(!$set->execute()){
+                $conn->rollBack();
+                return false;
+            }
         }
 
         $query = "
@@ -151,17 +172,17 @@ class PostServices extends Services {
             SET title = :title, content = :content
             WHERE id = :postId AND user_id = :userId;
         ";
-        $conn = $this->model->pdo;
         $set = $conn->prepare($query);
         $set->bindParam(':title', $title, PDO::PARAM_STR);
         $set->bindParam(':content', $content, PDO::PARAM_STR);
         $set->bindParam(':postId', $postId, PDO::PARAM_INT);
         $set->bindParam(':userId', $user_id, PDO::PARAM_INT);
-        $set->execute();
-
-        if(!$set) {
+        if(!$set->execute()){
+            $conn->rollBack();
             return false;
         }
+
+        $conn->commit();
         return true;
     }
 
@@ -189,15 +210,109 @@ class PostServices extends Services {
         if(!is_numeric(array_search($id, $posts))){
             return false;
         }
-        $query = "DELETE FROM posts WHERE id=:id";
         $conn = $this->model->pdo;
+        $conn->beginTransaction();
+        $query = "DELETE FROM posts WHERE id=:id";
         $set = $conn->prepare($query);
         $set->bindParam(':id', $id, PDO::PARAM_INT);
-        $set->execute();
-
-        if(!$set){
+        if(!$set->execute()){
+            $conn->rollBack();
             return false;
         }
+
+        $conn->commit();
+        return true;
+    }
+
+    public function store(array $post=[]){
+        $title = htmlspecialchars($post['title'], ENT_QUOTES, "UTF-8");
+        $content = htmlspecialchars($post['content'], ENT_QUOTES, "UTF-8");
+        $user_id = $post['user_id'];
+        $tags = $post['tags'];
+        $images = $post['images'];
+
+        $query = "INSERT INTO posts(title, content, user_id) value(:title, :content, :user_id);";
+        $queryPostTag = "INSERT INTO post_tag(post_id, tag_id) VALUE (:post_id, :tag_id)";
+        $queryImage = "INSERT INTO images (url, post_id) VALUES (:url, :post_id);";
+        $queryThumbnail = "UPDATE posts SET thumbnail = :imageId WHERE id = :postId";
+
+        // Init transaction
+        $conn = $this->model->pdo;
+        $conn->beginTransaction();
+
+        // Create new post
+        $conn = $this->model->pdo;
+        $set = $conn->prepare($query);
+        $set->bindParam(':title', $title, PDO::PARAM_STR);
+        $set->bindParam(':content', $content, PDO::PARAM_STR);
+        $set->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $setPost = $set->execute();
+        if(!$setPost) {
+            $conn->rollBack();
+            return false;
+        }
+        $postId = $conn->lastInsertId();
+
+        // Add post - tag
+        if(is_array($tags)){
+            foreach ($tags as $tag){
+                $set = $conn->prepare($queryPostTag);
+                $set->bindParam(':post_id', $postId, PDO::PARAM_INT);
+                $set->bindParam(':tag_id', $tag, PDO::PARAM_INT);
+                $setTag = $set->execute();
+                if(!$setTag) {
+                    $conn->rollBack();
+                    return false;
+                }
+            }
+        }
+
+        // Add images
+        if($images['name'][0]) {
+            $fileExtensions = ["jpeg", "jpg", "png"];
+            $uploadFileDir = '/public/assets/';
+
+            for($i=0; $i < count($images['name']); $i++){
+                $fileTmpPath = $images['tmp_name'][$i];
+                $fileName = $images['name'][$i];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
+
+                $hashFileName = md5(time() . $fileName);
+                $dest_path = $uploadFileDir . $hashFileName . "." . $fileExtension;
+
+                if(in_array($fileExtension, $fileExtensions)){
+                    if(!move_uploaded_file($fileTmpPath, ".".$dest_path)){
+                        $conn->rollBack();
+                        return false;
+                    }
+
+                    $set = $conn->prepare($queryImage);
+                    $set->bindParam(':url', $dest_path, PDO::PARAM_STR);
+                    $set->bindParam(':post_id', $postId, PDO::PARAM_INT);
+                    $setImage = $set->execute();
+                    if(!$setImage) {
+                        $conn->rollBack();
+                        return false;
+                    }
+                    $imageId = $conn->lastInsertId();
+
+                    if($i == 0){
+                        $set = $conn->prepare($queryThumbnail);
+                        $set->bindParam(':postId', $postId, PDO::PARAM_INT);
+                        $set->bindParam(':imageId', $imageId, PDO::PARAM_INT);
+                        $setPostImage = $set->execute();
+                        if(!$setPostImage) {
+                            $conn->rollBack();
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Commit
+        $conn->commit();
         return true;
     }
 }

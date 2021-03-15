@@ -6,4 +6,6 @@ RUN docker-php-ext-install mysqli && docker-php-ext-install pdo_mysql
 RUN ["/bin/bash", "-c", "a2enmod rewrite"]
 RUN ["/bin/bash", "-c", "service apache2 restart"]
 
+COPY php.ini-production /etc/php.ini
+
 EXPOSE 80

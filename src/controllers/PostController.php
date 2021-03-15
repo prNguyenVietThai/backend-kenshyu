@@ -24,63 +24,26 @@ class PostController extends Controller {
 
     public function store()
     {
-        $error = "";
-        $title = $_POST['title'];
-        $content = $_POST['content'];
-        $user_id = $_POST['user_id'];
-        $tags = $_POST['tags'];
-
-        if(!$title || !$content || !$user_id){
-            $error = 'information invalid';
-        }
-
-        if(!$error){
-            $postService = new PostServices();
-            $imageService = new ImageServices();
-            $post = $postService->create([
-                "title" => $title,
-                "content" => $content,
-                "user_id" => $user_id
+        $token = $_POST['token'];
+        if(!CSRF::verify($token)){
+            return $this->view("post-create", [
+                "ok" => false,
+                "message" => "csrf"
             ]);
-
-            if(!$post){
-                $error = 'cannot create post, try again later';
-            }else{
-                $postId = $post["id"];
-                $tagService = new TagServices();
-                foreach ($tags as $tagId){
-                    $tagService->addPostTag($postId, $tagId);
-                }
-                if($_FILES['images']['name'][0]) {
-                    $fileExtensions = ["jpeg", "jpg", "png"];
-
-                    for($i=0; $i < count($_FILES['images']['name']); $i++){
-                        $fileTmpPath = $_FILES['images']['tmp_name'][$i];
-                        $fileName = $_FILES['images']['name'][$i];
-                        $fileNameCmps = explode(".", $fileName);
-                        $fileExtension = strtolower(end($fileNameCmps));
-
-                        $uploadFileDir = '/public/assets/';
-                        $hashFileName = md5(time() . $fileName);
-                        $dest_path = $uploadFileDir . $hashFileName . "." . $fileExtension;
-
-                        if(in_array($fileExtension, $fileExtensions)){
-                            move_uploaded_file($fileTmpPath, ".".$dest_path);
-                            $image = $imageService->create([
-                                "url" => $dest_path,
-                                "post_id" => $postId
-                            ]);
-                            if($i == 0){
-                                $imageId = $image['id'];
-                                $postService->updateThumbnail($postId, $imageId);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
-        if(!$error){
+        $post = [
+            'title' => $_POST['title'],
+            'content' => $_POST['content'],
+            'user_id' => $_POST['user_id'],
+            'tags' => $_POST['tags'],
+            'images' => $_FILES['images']
+        ];
+
+        $postService = new PostServices();
+        $set = $postService->store($post);
+
+        if($set){
             return $this->view("post-create", [
                 "ok" => true,
                 "message" => 'create post successfully'
@@ -88,7 +51,7 @@ class PostController extends Controller {
         }else{
             return $this->view("post-create", [
                 "ok" => false,
-                "message" => $error
+                "message" => "create post faile"
             ]);
         }
     }

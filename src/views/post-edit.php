@@ -69,45 +69,46 @@
 
                 <div class="card">
                     <form id="form-edit" action="/posts/edit/<?php echo $data['post']['id']; ?>" method="POST">
-                    <div class="card-header">
-                        <h4>Edit post</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3 row">
-                            <label class="col-form-label"><b>Title</b></label>
-                            <div class="col-12">
-                                <input type="text" class="form-control" name="title" value="<?php echo $data['post']['title']?>">
-                            </div>
+                        <input type="hidden" name="token" value="<?php echo CSRF::token()?>">
+                        <div class="card-header">
+                            <h4>Edit post</h4>
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-form-label"><b>Description</b></label>
-                            <div class="col-12">
-                                <textarea type="text" class="form-control" name="content" style="height: 150px"><?php echo $data['post']['content']?></textarea>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Title</b></label>
+                                <div class="col-12">
+                                    <input type="text" class="form-control" name="title" value="<?php echo $data['post']['title']?>">
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label class="col-form-label"><b>Use tags</b></label>
-                            <div class="col-12">
-                                <select id="tags" class="form-control" name="tags[]" multiple="multiple">
-                                    <?php foreach ($data['tags'] as $tag):?>
-                                        <option
-                                                value="<?php echo $tag['id'] ?>"
-                                                <?php if(is_numeric(array_search($tag['id'], array_map(function ($tag){
-                                                    return $tag['id'];
-                                                },$data['tagsOfPost'])))): ?>
-                                                selected
-                                                <?php endif?>
-                                        ><?php echo $tag['title'] ?></option>
-                                    <?php endforeach?>
-                                </select>
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Description</b></label>
+                                <div class="col-12">
+                                    <textarea type="text" class="form-control" name="content" style="height: 150px"><?php echo $data['post']['content']?></textarea>
+                                </div>
                             </div>
+                            <div class="mb-3 row">
+                                <label class="col-form-label"><b>Use tags</b></label>
+                                <div class="col-12">
+                                    <select id="tags" class="form-control" name="tags[]" multiple="multiple">
+                                        <?php foreach ($data['tags'] as $tag):?>
+                                            <option
+                                                    value="<?php echo $tag['id'] ?>"
+                                                    <?php if(is_numeric(array_search($tag['id'], array_map(function ($tag){
+                                                        return $tag['id'];
+                                                    },$data['tagsOfPost'])))): ?>
+                                                    selected
+                                                    <?php endif?>
+                                            ><?php echo $tag['title'] ?></option>
+                                        <?php endforeach?>
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="hidden" name="_method" value="PATCH">
                         </div>
-                        <input type="hidden" name="_method" value="PATCH">
-                    </div>
-                    <div class="card-footer">
-                        <button id="edit-post" type="submit" class="btn btn-success">Save</button>
-                        <a href="/posts/show/<?php echo $data['post']['id'] ?>" class="btn btn-danger">Cancel</a>
-                    </div>
+                        <div class="card-footer">
+                            <button id="edit-post" type="submit" class="btn btn-success">Save</button>
+                            <a href="/posts/show/<?php echo $data['post']['id'] ?>" class="btn btn-danger">Cancel</a>
+                        </div>
                     </form>
                 </div>
 

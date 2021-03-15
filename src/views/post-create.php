@@ -44,12 +44,12 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                    <li class="breadcrumb-item active" aria-current="page">Create</li>
                 </ol>
             </nav>
         </div>
         <div class="row">
-            <div class="col-4"">
+            <div class="col-lg-4"">
                 <?php if(isset($data['ok'])): ?>
                     <script>
                         Swal.fire({
@@ -67,12 +67,13 @@
                 <?php endif ?>
 
                 <div class="card">
-                    <div class="card-header">
-                        <h4>Create new post</h4>
-                    </div>
-                    <div class="card-body">
-                        <form enctype="multipart/form-data" action="/posts/create" method="POST">
+                    <form enctype="multipart/form-data" action="/posts/create" method="POST">
+                        <div class="card-header">
+                            <h4>Create new post</h4>
+                        </div>
+                        <div class="card-body">
                             <div class="mb-3 row">
+                                <input type="hidden" name="token" value="<?php echo CSRF::token()?>">
                                 <label class="col-form-label"><b>Title</b></label>
                                 <div class="col-12">
                                     <input type="text" class="form-control" name="title">
@@ -98,12 +99,14 @@
                                 <input type="file" class="form-control" onchange="loadFile(event)" name="images[]" accept="image/x-png,image/gif,image/jpeg" multiple>
                             </div>
                             <input type="hidden" class="form-control" name="user_id" value="<?php echo $_SESSION['id'] ?>">
+                        </div>
+                        <div class="card-footer">
                             <button type="submit" class="btn btn-success">Save</button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-8">
+            <div class="col-lg-8">
                 <div id="image-list">
                     <img id="output" style="width: 100%;"/>
                 </div>

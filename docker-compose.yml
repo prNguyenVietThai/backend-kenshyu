@@ -12,6 +12,12 @@ services:
       - ./src:/var/www/html/
     ports:
       - 8080:80
+    environment:
+      - HOST=db
+      - DATABASE=test_db
+      - USER=root
+      - PASS=root
+      - SECRET_KEY=prtimes
   db:
     container_name: mysql8
     image: mysql:8.0
