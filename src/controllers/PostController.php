@@ -100,6 +100,11 @@ class PostController extends Controller {
             $error = "Information invalid";
         }
 
+        $token = $_POST['token'];
+        if(!CSRF::verify($token)){
+            $error = "csrf";
+        }
+
         $ptitle = (string)$_POST['title'];
         $pcontent = (string)$_POST['content'];
         $ptags = (array)$_POST['tags'];
@@ -149,6 +154,11 @@ class PostController extends Controller {
     {
         $postService = new PostServices();
         $error = '';
+        $token = $_POST['token'];
+        if(!CSRF::verify($token)){
+            $error = "csrf";
+        }
+
         $user_id = $_SESSION['id'];
         if(!$user_id) {
             $error = "Unauthenticated";
