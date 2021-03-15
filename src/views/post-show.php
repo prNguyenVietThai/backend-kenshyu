@@ -44,7 +44,7 @@
         </nav>
     </div>
     <div class="row">
-        <div class="col-4">
+        <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
                     <h4>Post infomartion</h4>
@@ -83,7 +83,7 @@
                 <?php endif ?>
             </div>
         </div>
-        <div class="col-8 d-flex-wrap">
+        <div class="col-lg-8 d-flex-wrap">
             <?php if(is_array($data['images'])): ?>
                 <?php foreach ($data['images'] as $key) : ?>
                     <img class="img-thumbnail" style="width: 400px; height: 240px" src="<?php echo $key['url']; ?>">

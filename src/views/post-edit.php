@@ -50,7 +50,7 @@
     </div>
     <div class="row">
         <?php if(isset($data) && $data['message'] != 'Permission denied' && $data['message'] != 'Unauthenticated'): ?>
-            <div class="col-4">
+            <div class="col-lg-4">
                 <?php if(isset($data['ok'])): ?>
                     <script>
                         Swal.fire({
@@ -113,7 +113,7 @@
                 </div>
 
             </div>
-            <div class="col-8 d-flex-wrap">
+            <div class="col-lg-8 d-flex-wrap">
                 <?php foreach ($data['images'] as $key) : ?>
                     <img class="img-thumbnail" style="width: 400px; height: 240px" src="<?php echo $key['url']; ?>">
                 <?php endforeach;?>
