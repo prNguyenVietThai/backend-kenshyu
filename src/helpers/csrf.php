@@ -4,11 +4,12 @@
 
         public static function token()
         {
-            if(!isset($_SESSION) && $_SESSION['id']){
-                return false;
-            }
+            $data= random_bytes(32);
             $salt = '$'.$_ENV['SECRET_TOKEN'].'$';
-            return crypt($_SESSION['id'], $salt);
+            $token = crypt($data, $salt);
+            $_SESSION['csrf'] = $token;
+
+            return $token;
         }
 
         public static function verify($token)
@@ -16,9 +17,10 @@
             if(!isset($_SESSION) && $_SESSION['id']){
                 return false;
             }
-            if(!hash_equals(self::token(), $token)){
+            if($_SESSION['csrf'] != $token){
                 return false;
             }
+            unset($_SESSION['csrf']);
             return true;
         }
     }
