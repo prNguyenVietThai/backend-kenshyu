@@ -155,6 +155,8 @@ class PostServices extends Services {
     }
 
     public function delete(int $id, int $userId){
+        $imageService = new ImageServices();
+        $images = $imageService->getByPostId($id);
         $conn = $this->model->pdo;
         $conn->beginTransaction();
         try {
@@ -177,6 +179,9 @@ class PostServices extends Services {
             }
 
             $conn->commit();
+            foreach ($images as $image){
+                unlink(__DIR__."/..".$image['url']);
+            }
             return true;
         }catch (Exception $e){
             $conn->rollBack();
